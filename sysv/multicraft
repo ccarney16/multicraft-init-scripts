@@ -1,0 +1,80 @@
+#!/bin/bash
+# Description: Multicraft Startup Script
+# processname: multicraft
+
+### BEGIN INIT INFO
+# Provides: multicraft
+# Required-Start:    $syslog $remote_fs $network $named $mysql
+# Required-Stop:     $syslog $remote_fs $network $named
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: Multicraft Bridge Service
+# Description:
+### END INIT INFO
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin:/home/minecraft/multicraft/bin
+NAME=multicraft
+DAEMON=/home/multicraft/bin/$NAME
+DESC="multicraft bridge"
+PIDFILE=/home/multicraft/$NAME.pid
+SCRIPTNAME=/etc/init.d/$NAME
+DAEMON_OPTS="-v start"
+DAEMON_OPTS2="-v stop"
+
+[ -r /etc/default/multicraft ] && . /etc/default/multicraft
+
+. /lib/init/vars.sh
+
+. /lib/lsb/init-functions
+
+case "$1" in
+    start)
+        log_daemon_msg "Starting $DESC" $NAME
+        if ! start-stop-daemon --start --oknodo \
+            --pidfile $PIDFILE --exec $DAEMON -- $DAEMON_OPTS
+        then
+            log_end_msg 1
+        else
+            log_end_msg 0
+        fi
+        ;;
+    stop)
+        log_daemon_msg "Stopping $DESC" $NAME
+        if start-stop-daemon --stop --retry 30 --oknodo \
+            --pidfile $PIDFILE --exec $DAEMON -- $DAEMON_OPTS2
+        then
+            log_end_msg 0
+        else
+            log_end_msg 1
+        fi
+        ;;
+    reload|force-reload)
+        log_daemon_msg "Reloading $DESC configuration" $NAME
+        if start-stop-daemon --stop --signal INT --quiet \
+            --pidfile $PIDFILE --exec $DAEMON
+        then
+            rm $PIDFILE
+            if start-stop-daemon --start --quiet  \
+                --pidfile $PIDFILE --exec $DAEMON -- $DAEMON_OPTS ; then
+                log_end_msg 0
+            else
+                log_end_msg 1
+            fi
+        else
+            log_end_msg 1
+        fi
+        ;;
+    restart)
+        $0 stop
+        $0 start
+        ;;
+    status)
+        status_of_proc -p "$PIDFILE" "$DAEMON" multicraft && exit 0 || exit $?
+        ;;
+    *)
+        echo "Usage: $SCRIPTNAME {start|stop|restart|reload|force-reload|status}" >&2
+        exit 1
+        ;;
+esac
+
+exit 0
