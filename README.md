@@ -5,5 +5,6 @@ startup script for common distros such as Ubuntu or CentOS. Please note these sc
 
 
 SysV requirements: Ubuntu 14.04 and older; CentOS 6 and older
-SystemD Requirements: Ubuntu 16.04 or later; CentOS 7 or later
+
+systemd Requirements: Ubuntu 16.04 or later; CentOS 7 or later
 
