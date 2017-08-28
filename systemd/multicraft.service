@@ -2,14 +2,13 @@
 Description=Multicraft Daemon
 
 [Service]
-Type=forking
 User=root
+Type=forking
+PIDFile=/srv/multicraft/multicraft.pid
 WorkingDirectory=/srv/multicraft
 ExecStartPre=/usr/bin/rm -f /srv/multicraft/multicraft.pid
-PIDFile=/srv/multicraft/multicraft.pid
 ExecStart=/srv/multicraft/bin/multicraft -v start
 ExecStop=/srv/multicraft/bin/multicraft -v stop
-Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
